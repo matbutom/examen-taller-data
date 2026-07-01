@@ -4,8 +4,9 @@ import xml.etree.ElementTree as ET
 import json, re, shutil
 from datetime import datetime, timedelta
 
-XLSX = Path('/mnt/data/Plantilla_Encargo02_Replica.xlsx')
-OUT = Path('/mnt/data/replica_web')
+ROOT = Path(__file__).resolve().parent
+XLSX = max(ROOT.glob('*.xlsx'), key=lambda path: path.stat().st_mtime)
+OUT = ROOT
 
 NS = {
     'main': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
@@ -127,10 +128,8 @@ def drawing_image_map(z, drawing_xml):
     return image_by_row
 
 def build():
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    (OUT / 'assets' / 'images').mkdir(parents=True)
-    (OUT / 'data').mkdir(parents=True)
+    (OUT / 'assets' / 'images').mkdir(parents=True, exist_ok=True)
+    (OUT / 'data').mkdir(parents=True, exist_ok=True)
 
     items = []
     with ZipFile(XLSX) as z:
@@ -152,10 +151,8 @@ def build():
                 if image_src:
                     ext = Path(image_src).suffix or '.jpg'
                     filename = f"{config['slug']}-{r:03d}{ext}"
-                    z.extract(image_src, OUT)
-                    src_file = OUT / image_src
                     dst_file = OUT / 'assets' / 'images' / filename
-                    dst_file.write_bytes(src_file.read_bytes())
+                    dst_file.write_bytes(z.read(image_src))
                     image_path = f"assets/images/{filename}"
 
                 raw_fecha = row.get('D', '')
@@ -178,13 +175,9 @@ def build():
                     'categorySlug': safe_slug(tematica),
                 })
 
-    # remove extracted intermediate xl folder
-    if (OUT / 'xl').exists():
-        shutil.rmtree(OUT / 'xl')
-
     payload = {
         'title': 'Réplica temporal',
-        'source': 'Plantilla_Encargo02_Replica.xlsx',
+        'source': XLSX.name,
         'generatedAt': datetime.now().isoformat(timespec='seconds'),
         'total': len(items),
         'items': items,
@@ -192,7 +185,9 @@ def build():
     (OUT / 'data' / 'data.json').write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding='utf-8')
 
     # Also keep a copy of the Excel in root as archival source.
-    shutil.copy2(XLSX, OUT / 'Plantilla_Encargo02_Replica.xlsx')
+    archive_copy = OUT / XLSX.name
+    if XLSX.resolve() != archive_copy.resolve():
+        shutil.copy2(XLSX, archive_copy)
 
     return payload
 

@@ -81,11 +81,15 @@ function renderSelection() {
   const eventName = item.hito === 'Estallido' ? 'estallido social' : 'pandemia';
   const theme = item.tematica || 'sin dato';
   const percentage = item.porcentaje || 'sin dato';
+  const dateLabel = formatDate(item.fecha);
 
   topPanel.innerHTML = `
     <article class="selection">
-      <div class="image-box">
-        <img src="${item.image}" alt="${escapeHtml(item.texto || label)}" />
+      <div class="image-column">
+        <div class="image-box">
+          <img src="${item.image}" alt="${escapeHtml(item.texto || label)}" />
+        </div>
+        ${dateLabel ? `<p class="image-date">${escapeHtml(dateLabel)}</p>` : ''}
       </div>
       <div class="selection-info">
         <h1 class="selected-word">${escapeHtml(label)}</h1>
@@ -193,6 +197,12 @@ function normalizeWord(value) {
 
 function getThemeColor(theme) {
   return colorsByTheme[theme] || '#646464';
+}
+
+function formatDate(value) {
+  const match = String(value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return value || '';
+  return `${match[3]}/${match[2]}/${match[1]}`;
 }
 
 function escapeHtml(value) {
