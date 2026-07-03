@@ -1,5 +1,5 @@
-const manifiestoTitulo = 'manifiesto del proyecto:';
-const manifiestoTexto = 'este proyecto es la respuesta de los datos recopilados en torno a los hitos sociales en chile, y cuales eran los principales temas abordados en el estallido social y la pandemia. a raiz de eso se conforma este poema navegable, donde encontraras los datos, sus imagenes y sus clasificaciones ocultas.';
+const manifiestoTitulo = 'Manifiesto Hitos Sociales:';
+const manifiestoTexto = 'Las palabras también son datos. Cada una de ellas fue escrita por alguien, en un momento de incertidumbre, conflicto o transformación. Reunidas, dejan de pertenecer a una sola voz y comienzan a construir una memoria colectiva. Este poema procedural no busca narrar una historia, sino revelar los temas que atravesaron el estallido social y la pandemia a partir de las palabras que las personas compartieron en redes sociales. Explora el poema. Descubre el origen de cada palabra y las relaciones ocultas entre los datos, las imágenes y sus clasificaciones.';
 
 const colorsByTheme = {
   'Política': '#c81e1e',
